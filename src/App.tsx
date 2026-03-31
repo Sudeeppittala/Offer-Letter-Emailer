@@ -10,7 +10,7 @@ export default function App() {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [view, setView] = useState<'home' | 'setup' | 'campaigns' | 'backend'>('home');
-  const [loading, setLoading] = useState(false;
+  const [loading, setLoading] = useState(false);
   const [backendConfig, setBackendConfig] = useState<BackendConfig | null>(null);
 
   useEffect(() => {
