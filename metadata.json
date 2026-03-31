@@ -1,0 +1,5 @@
+{
+  "name": "OfferMail Communicator",
+  "description": "HR agency automation for offer letter email generation and sending via Google Sheets and Apps Script.",
+  "requestFramePermissions": []
+}
