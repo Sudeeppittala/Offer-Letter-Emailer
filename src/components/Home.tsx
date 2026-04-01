@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Client, MASTER_BACKEND_SHEET_URL } from '../types';
+import { Client } from '../types';
 import { Plus, Info, CheckCircle2, XCircle, Building2, ArrowRight, Database, ExternalLink, Edit2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import AddClientModal from './AddClientModal';
@@ -10,10 +10,10 @@ interface HomeProps {
   onSelectClient: (id: string) => void;
   onAddClient: (client: Omit<Client, 'id'>) => Promise<any>;
   onUpdateClient: (client: Client) => Promise<any>;
-  isSynced: boolean;
+  isEditMode: boolean;
 }
 
-export default function Home({ clients, onSelectClient, onAddClient, onUpdateClient, isSynced }: HomeProps) {
+export default function Home({ clients, onSelectClient, onAddClient, onUpdateClient, isEditMode }: HomeProps) {
   const [showHelp, setShowHelp] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -22,15 +22,6 @@ export default function Home({ clients, onSelectClient, onAddClient, onUpdateCli
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold tracking-tight">Client Directory</h2>
-        {isSynced && (
-          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-bold border border-emerald-100">
-            <Database className="w-3.5 h-3.5" />
-            Synced with Google Sheet
-            <a href={MASTER_BACKEND_SHEET_URL} target="_blank" rel="noreferrer" className="hover:text-emerald-900">
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
-        )}
       </div>
 
       <AnimatePresence>
@@ -53,11 +44,11 @@ export default function Home({ clients, onSelectClient, onAddClient, onUpdateCli
                   <Info className="w-5 h-5" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-semibold text-lg">Welcome! To get started:</h3>
+                  <h3 className="font-semibold text-lg">Welcome to OfferMail Communicator</h3>
                   <ol className="text-neutral-300 space-y-1 list-decimal list-inside text-sm">
-                    <li>Click a client card below to manage their configuration.</li>
-                    <li>Configure their Google Sheet, Offer Letter Doc, and Apps Script.</li>
-                    <li>Once configured, you can upload candidates and send offer emails.</li>
+                    <li>Click a client card below to manage their offer letter campaign.</li>
+                    <li>Set up their Offer Letter Doc Template ID and Apps Script Web App URL inside each client.</li>
+                    <li>Upload candidate data and send personalized offer emails in bulk.</li>
                   </ol>
                 </div>
               </div>
@@ -73,13 +64,15 @@ export default function Home({ clients, onSelectClient, onAddClient, onUpdateCli
             layoutId={client.id}
             className="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col group relative"
           >
-            <button 
-              onClick={(e) => { e.stopPropagation(); setEditingClient(client); }}
-              className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur border border-neutral-200 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 z-10 text-neutral-500 hover:text-neutral-900 shadow-sm"
-              title="Edit Client Details"
-            >
-              <Edit2 className="w-4 h-4" />
-            </button>
+            {isEditMode && (
+              <button 
+                onClick={(e) => { e.stopPropagation(); setEditingClient(client); }}
+                className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur border border-neutral-200 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 z-10 text-neutral-500 hover:text-neutral-900 shadow-sm"
+                title="Edit Client Details"
+              >
+                <Edit2 className="w-4 h-4" />
+              </button>
+            )}
             <div className="flex justify-between items-start mb-4">
               <div className="bg-neutral-100 p-3 rounded-xl group-hover:bg-neutral-900 group-hover:text-white transition-colors flex items-center justify-center w-12 h-12">
                 {client.companyLogoUrl ? (
@@ -89,7 +82,7 @@ export default function Home({ clients, onSelectClient, onAddClient, onUpdateCli
                 )}
               </div>
               <div className="flex flex-col items-end gap-2 pr-10">
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${client.active ? 'bg-emerald-100 text-emerald-700' : 'bg-neutral-100 text-neutral-500'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${client.active ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-neutral-100 text-neutral-500'}`}>
                   {client.active ? 'Active' : 'Inactive'}
                 </span>
                 <span className="text-xs font-mono text-neutral-400">{client.shortCode}</span>
@@ -109,7 +102,7 @@ export default function Home({ clients, onSelectClient, onAddClient, onUpdateCli
 
             <button
               onClick={() => onSelectClient(client.id)}
-              className="w-full bg-neutral-900 text-white py-2.5 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-neutral-800 transition-colors"
+              className="w-full bg-purple-700 text-white py-2.5 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-purple-800 transition-colors"
             >
               Go to Client
               <ArrowRight className="w-4 h-4" />
@@ -117,16 +110,24 @@ export default function Home({ clients, onSelectClient, onAddClient, onUpdateCli
           </motion.div>
         ))}
 
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="border-2 border-dashed border-neutral-200 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 text-neutral-400 hover:border-neutral-900 hover:text-neutral-900 transition-all group"
-        >
-          <div className="bg-neutral-50 p-4 rounded-full group-hover:bg-neutral-900 group-hover:text-white transition-colors">
-            <Plus className="w-8 h-8" />
-          </div>
-          <span className="font-semibold">Add New Client</span>
-        </button>
+        {isEditMode && (
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="border-2 border-dashed border-neutral-200 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 text-neutral-400 hover:border-purple-600 hover:text-purple-600 transition-all group"
+          >
+            <div className="bg-neutral-50 p-4 rounded-full group-hover:bg-purple-600 group-hover:text-white transition-colors">
+              <Plus className="w-8 h-8" />
+            </div>
+            <span className="font-semibold">Add New Client</span>
+          </button>
+        )}
       </div>
+
+      {!isEditMode && (
+        <p className="text-center text-sm text-neutral-400 mt-4">
+          🔒 Enable editing from the header to add or manage clients.
+        </p>
+      )}
 
       {showAddModal && (
         <AddClientModal 

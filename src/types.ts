@@ -54,9 +54,4 @@ export interface SendLog {
   errorMessage?: string;
 }
 
-export interface BackendConfig {
-  backendWebAppUrl: string;
-}
-
 export const MASTER_SHEET_TEMPLATE_URL = "https://docs.google.com/spreadsheets/d/11pYHHpTgOAJU-gjq7H88Tib4PpYzmr1HOAM2jM9AlYc/edit?pli=1&gid=0#gid=0";
-export const MASTER_BACKEND_SHEET_URL = "https://docs.google.com/spreadsheets/d/1KNTr0ZZ9HAVwthXnMLGpv1uiq2UeHLEwXbPXjPjru_M/edit?usp=sharing";
